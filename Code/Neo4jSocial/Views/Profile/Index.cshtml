@@ -1,0 +1,553 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/Layout.cshtml";
+    Neo4jSocial.Models.Profile node = ViewData["node"] as Neo4jSocial.Models.Profile;
+    List<Neo4jSocial.Models.Status> lstStt = ViewData["lstStt"] as List<Neo4jSocial.Models.Status>;
+    string displayName = node.FirstName + " " + node.LastName;
+
+    List<Neo4jSocial.Models.Profile> lstF = ViewData["lstF"] as List<Neo4jSocial.Models.Profile>;
+    List<Neo4jSocial.DTO.SuggestionFriend> lstSF = ViewData["lstSF"] as List<Neo4jSocial.DTO.SuggestionFriend>;
+    Neo4jSocial.DAO.ProfileDAO dao = new Neo4jSocial.DAO.ProfileDAO();
+}
+
+<div class="profile-header-photo">
+    <div class="profile-header-photo-in">
+        <div class="tbl-cell">
+            <div class="info-block">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xl-9 col-xl-offset-3 col-lg-8 col-lg-offset-4 col-md-offset-0">
+                            <div class="tbl info-tbl">
+                                <div class="tbl-row">
+                                    <div class="tbl-cell">
+                                        <p class="title">Dan Counsell</p>
+                                        <p>Company Founder</p>
+                                    </div>
+                                    <div class="tbl-cell tbl-cell-stat">
+                                        <div class="inline-block">
+                                            <p class="title">@ViewData["countStatus"]</p>
+                                            <p>Bài đăng</p>
+                                        </div>
+                                    </div>
+                                    <div class="tbl-cell tbl-cell-stat">
+                                        <div class="inline-block">
+                                            <p class="title">@ViewData["countShare"]</p>
+                                            <p>Bài chia sẻ</p>
+                                        </div>
+                                    </div>
+                                    <div class="tbl-cell tbl-cell-stat">
+                                        <div class="inline-block">
+                                            <p class="title">@ViewData["countCmt"]</p>
+                                            <p>Bình luận tích cực</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</div><!--.profile-header-photo-->
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-3 col-lg-4">
+            <aside class="profile-side">
+                <section class="box-typical profile-side-user">
+                    <button type="button" class="avatar-preview avatar-preview-128">
+                        <img src="~/Content/Uploads/@Html.Raw(Session["user"].ToString()+"/"+node.Avatar)" alt="Avatar" />
+                    </button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-rounded btn-primary-outline">
+                            Theo dõi
+                        </button>
+                    </div>
+                    <div class="bottom-txt">@displayName</div>
+                </section>
+
+                <section class="box-typical">
+                    <header class="box-typical-header-sm bordered">Thông tin chi tiết</header>
+                    <div class="box-typical-inner">
+                        @if (node.Interest != "")
+                        {
+                            <p class="line-with-icon">
+                                <i class="font-icon font-icon-help"></i>
+                                @Html.Raw(node.Interest)
+                            </p>
+                        }
+                        @if (node.Email != "")
+                        {
+                            <p class="line-with-icon">
+                                <i class="font-icon font-icon-pencil"></i>
+                                @Html.Raw(node.Email)
+                            </p>
+                        }
+                        @if (node.City != "")
+                        {
+                            <p class="line-with-icon">
+                                <i class="font-icon font-icon-pin-2"></i>
+                                @Html.Raw(node.City)
+                            </p>
+                        }
+                        @if (node.Company != "")
+                        {
+                            <p class="line-with-icon">
+                                <i class="font-icon font-icon-users-two"></i>
+                                @Html.Raw(node.Company)
+                            </p>
+                        }
+                        @if (node.Job != "")
+                        {
+                            <p class="line-with-icon">
+                                <i class="font-icon font-icon-case-3"></i>
+                                @Html.Raw(node.Job)
+                            </p>
+                        }
+                        @if (node.School != "")
+                        {
+                            <p class="line-with-icon">
+                                <i class="font-icon font-icon-learn"></i>
+                                @Html.Raw(node.School)
+                            </p>
+                        }
+                    </div>
+                </section>
+
+
+                <section class="box-typical profile-side-stat">
+                    <div class="tbl">
+                        <div class="tbl-row">
+                            <div class="tbl-cell">
+                                <span class="number">@Html.Raw(lstF.Count().ToString())</span>
+                                Bạn bè
+                            </div>
+                            <div class="tbl-cell">
+                                <span class="number" id="numRequestsPrint">0</span>
+                                Người theo dõi
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="box-typical">
+                    <header class="box-typical-header-sm">Có thể bạn quen biết.</header>
+                    <div class="friends-list stripped">
+                        @foreach (var item in lstSF)
+                        {
+                            <article class="friends-list-item">
+                                <div class="user-card-row">
+                                    <div class="tbl-row">
+                                        <div class="tbl-cell tbl-cell-photo">
+                                            <a href="#">
+                                                <img src="~/Content/Uploads/@Html.Raw(item.User+"/"+item.Avatar)" alt="">
+                                            </a>
+                                        </div>
+                                        <div class="tbl-cell">
+                                            <p class="user-card-row-name status-online"><a href="#">@Html.Raw(item.FirstName+" "+item.LastName)</a></p>
+                                            @{ int old = DateTime.Now.Year - item.Birthday.Year;}
+                                            <p class="user-card-row-status">@Html.Raw(item.Gender+", "+old.ToString()+" tuổi, ") <a href="#">@Html.Raw(item.Num+" bạn chung")</a></p>
+                                        </div>
+                                        <div class="tbl-cell tbl-cell-action">
+                                            <form method="post" action="/Friend/Accept/">
+                                                <input type="hidden" value="@item.User" name="User" />
+                                                <button class="plus-link-circle"><span>+</span></button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        }
+                    </div>
+
+                    <div class="see-all">
+                        <a href="#">Xem thêm..</a>
+                    </div>
+                </section><!--.box-typical-->
+
+            </aside><!--.profile-side-->
+        </div>
+
+        <div class="col-xl-9 col-lg-8">
+            <section class="tabs-section">
+                <div class="tabs-section-nav tabs-section-nav-left">
+                    <ul class="nav" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#tabs-2-tab-1" role="tab" data-toggle="tab">
+                                <span class="nav-link-in">Dòng thời gian</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#tabs-2-tab-2" role="tab" data-toggle="tab" id="gotoaddinfomation">
+                                <span class="nav-link-in">Giới thiệu</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#tabs-2-tab-3" role="tab" data-toggle="tab">
+                                <span class="nav-link-in">Bạn bè</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#tabs-2-tab-4" role="tab" data-toggle="tab">
+                                <span class="nav-link-in">Ảnh</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div><!--.tabs-section-nav-->
+
+                <div class="tab-content no-styled profile-tabs">
+                    <div role="tabpanel" class="tab-pane active" id="tabs-2-tab-1">
+                        <form class="box-typical" method="post" action="~/Profile/Post">
+                            <input type="text" class="write-something" name="Content" placeholder="Bạn đang nghĩ gì?" />
+                            <input type="hidden" name="Avatar" value="@node.Avatar" />
+                            <input type="hidden" name="DisplayName" value="@displayName" />
+                            <div class="box-typical-footer">
+                                <div class="tbl">
+                                    <div class="tbl-row">
+                                        <div class="tbl-cell">
+                                            <button type="button" class="btn-icon">
+                                                <i class="font-icon font-icon-earth"></i>
+                                            </button>
+                                            <button type="button" class="btn-icon">
+                                                <i class="font-icon font-icon-picture"></i>
+                                            </button>
+                                            <button type="button" class="btn-icon">
+                                                <i class="font-icon font-icon-calend"></i>
+                                            </button>
+                                            <button type="button" class="btn-icon">
+                                                <i class="font-icon font-icon-video-fill"></i>
+                                            </button>
+                                        </div>
+                                        <div class="tbl-cell tbl-cell-action">
+                                            <button type="submit" class="btn btn-rounded">Đăng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form><!--.box-typical-->
+
+
+                        @foreach (var stt in lstStt)
+                        {
+                            if (stt.TypeStt == "POST")
+                            {
+                                <article class="box-typical profile-post">
+                                    <div class="profile-post-header">
+                                        <div class="user-card-row">
+                                            <div class="tbl-row">
+                                                <div class="tbl-cell tbl-cell-photo">
+                                                    <a href="#">
+                                                        <img src="~/Content/Uploads/@Html.Raw(Session["user"].ToString()+"/"+node.Avatar)" alt="">
+                                                    </a>
+                                                </div>
+                                                <div class="tbl-cell">
+                                                    <div class="user-card-row-name">
+                                                        <a href="#">
+                                                            @displayName
+                                                        </a>
+                                                    </div>
+                                                    <div class="color-blue-grey-lighter">@stt.TimePost.ToDateTime().ToString("d/M/yyyy HH:mm tt")</div>
+                                                </div>
+                                                <div class="tbl-cell" style="width:20px">
+                                                    <a href="/Profile/Share/@stt.Id">
+                                                        <i class="font-icon font-icon-share"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="/Profile/DeleteSTT/@stt.Id" class="shared">
+                                            <i class="font-icon font-icon-trash"></i>
+                                        </a>
+                                    </div>
+                                    <div class="profile-post-content">
+
+                                        <p>@stt.Content</p>
+                                    </div>
+                                    <div class="box-typical-footer profile-post-meta">
+                                        <a class="meta-item" href="#">
+                                            <i class="font-icon font-icon-heart"></i>
+                                        </a>
+
+                                        <a href="/Status/Index/@stt.Id" class="meta-item" target="_blank">
+                                            <i class="font-icon font-icon-comment"></i>
+
+                                        </a>
+                                    </div>
+                                </article>
+                            }
+                            else
+                            {
+                                <article class="box-typical profile-post">
+                                    <div class="comment-rows-container hover-action scrollable-block">
+                                        <div class="comment-row-item">
+                                            <div class="avatar-preview avatar-preview-32">
+                                                <a href="#">
+                                                    <img src="~/Content/Uploads/@Html.Raw(Session["user"].ToString()+"/"+node.Avatar)" alt="">
+                                                </a>
+                                            </div>
+                                            <div class="tbl comment-row-item-header">
+                                                <div class="tbl-row">
+                                                    <div class="tbl-cell tbl-cell-name">@displayName</div>
+                                                    <div class="tbl-cell tbl-cell-date">@stt.TimeShare.ToDateTime().ToString("d/M/yyyy HH:mm tt")</div>
+                                                </div>
+                                            </div>
+                                            <div class="comment-row-item-content">
+                                                <p>Bài viết được chia sẻ của <b>@stt.DisplayName</b></p>
+                                                <a href="/Status/Index/@stt.Id" class="comment-row-item-action edit" target="_blank">
+                                                    <i class="font-icon font-icon-comment"></i>
+                                                </a>
+                                                <a href="/Profile/DeleteShare/@stt.RelationId" class="comment-row-item-action del">
+                                                    <i class="font-icon font-icon-trash"></i>
+                                                </a>
+                                                <div class="comment-row-item quote">
+                                                    <div class="avatar-preview avatar-preview-32">
+                                                        <a href="#">
+                                                            <img src="~/Content/Uploads/@Html.Raw(stt.UserPost+"/"+stt.AvatarPost)" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="tbl comment-row-item-header">
+                                                        <div class="tbl-row">
+                                                            <div class="tbl-cell tbl-cell-name">@stt.DisplayName</div>
+                                                            <div class="tbl-cell tbl-cell-date">@stt.TimePost.ToDateTime().ToString("d/M/yyyy HH:mm:ss tt")</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="comment-row-item-content">
+                                                        <p>@stt.Content</p>
+                                                    </div>
+                                                </div><!--.comment-row-item-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            }
+
+                        }
+
+                    </div><!--.tab-pane-->
+                    <div role="tabpanel" class="tab-pane" id="tabs-2-tab-2">
+                        <section class="box-typical profile-settings">
+                            <form action="~/Profile/Update" method="post" accept="image/png, image/jpeg" enctype="multipart/form-data">
+                                <input type="hidden" name="mode" value="@ViewBag.mode" />
+                                <section class="box-typical-section">
+                                    <header class="box-typical-header-sm" style="color:red">THÔNG TIN BẮT BUỘC!</header>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">Avatar</label>
+                                        </div>
+                                        <div class="col-xl-4">
+                                            <div class="box-typical profile-side-user" style="width:128px;height:128px;padding:0px">
+                                                <button type="button" class="avatar-preview avatar-preview-128" onclick="clickAvatar()">
+                                                    <img src="~/Content/Uploads/@Html.Raw(Session["user"].ToString()+"/"+node.Avatar)" alt="Avatar" />
+                                                    <span class="update">
+                                                        <i class="font-icon font-icon-picture-double"></i>
+                                                        Thay đổi avatar
+                                                    </span>
+                                                </button>
+                                            </div>
+                                            <input type="file" id="avatar" name="avatar" hidden />
+                                            <script>
+                                                function clickAvatar() {
+                                                    $("#avatar").click();
+                                                }
+
+                                            </script>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">Họ</label>
+                                        </div>
+                                        <div class="col-xl-4">
+                                            <input class="form-control" type="text" value="@node.FirstName" name="FirstName" required />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">Tên</label>
+                                        </div>
+                                        <div class="col-xl-4">
+                                            <input class="form-control" type="text" value="@node.LastName" name="LastName" required />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">Ngày sinh</label>
+                                        </div>
+                                        <div class="col-xl-6">
+                                            <input class="form-control" type="date" value="@node.Birthday" name="Birthday" required />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">Giới tính</label>
+                                        </div>
+                                        <div class="col-xl-6">
+                                            <div class="form-check form-check-inline">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="radio" name="Gender" value="Nam" @if (node.Gender == "Nam" || ViewBag.mode == "Add") { @Html.Raw("checked") }> Nam
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="radio" name="Gender" value="Nu" @Html.Raw(node.Gender == "Nu" ? "checked" : "")> Nữ
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <section class="box-typical-section">
+                                    <header class="box-typical-header-sm">Thông tin chi tiết</header>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">
+                                                <i class="font-icon font-icon-help"></i>
+                                                Sở thích
+                                            </label>
+                                        </div>
+                                        <div class="col-xl-6">
+                                            <textarea rows="2" class="form-control" name="Interest">@node.Interest</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">
+                                                <i class="font-icon font-icon-pencil"></i>
+                                                Liên hệ
+                                            </label>
+                                        </div>
+                                        <div class="col-xl-4">
+                                            <input class="form-control" type="text" value="@node.Email" name="Email" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">
+                                                <i class="font-icon font-icon-pin-2"></i>
+                                                Thành phố
+                                            </label>
+                                        </div>
+                                        <div class="col-xl-4">
+                                            <input class="form-control" type="text" value="@node.City" name="City" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">
+                                                <i class="font-icon font-icon-users-two"></i>
+                                                Công ty
+                                            </label>
+                                        </div>
+                                        <div class="col-xl-4">
+                                            <input class="form-control" type="text" value="@node.Company" name="Company" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">
+                                                <i class="font-icon font-icon-case-3"></i>
+                                                Công việc
+                                            </label>
+                                        </div>
+                                        <div class="col-xl-6">
+                                            <input class="form-control" type="text" value="@node.Job" name="Job" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-xl-2">
+                                            <label class="form-label">
+                                                <i class="font-icon font-icon-learn"></i>
+                                                Học trường
+                                            </label>
+                                        </div>
+                                        <div class="col-xl-6">
+                                            <input class="form-control" type="text" value="@node.School" name="School" />
+                                        </div>
+                                    </div>
+                                </section>
+                                <section class="box-typical-section profile-settings-btns">
+                                    <button type="submit" class="btn btn-rounded">Lưu thay đổi</button>
+                                    <button type="button" class="btn btn-rounded btn-grey">Cancel</button>
+                                </section>
+                            </form>
+                        </section>
+                    </div><!--.tab-pane-->
+                    <div role="tabpanel" class="tab-pane" id="tabs-2-tab-3">
+                        <section class="box-typical box-typical-padding" style="background:#eceff4; border:0px;">
+                            <div class="row card-user-grid">
+                                @foreach (var item in lstF)
+                                {
+                                    <div class="col-sm-6 col-md-4 col-xl-3">
+                                        <article class="card-user box-typical">
+                                            <a href="#" class="card-user-action float-left">
+                                                <i class="font-icon font-icon-revers"></i>
+                                            </a>
+                                            <div class="card-user-action float-right">
+                                                <div class="dropdown dropdown-user-menu">
+                                                    <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <span class="glyphicon glyphicon-option-vertical"></span>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right">
+                                                        <a class="dropdown-item" href="#"><span class="font-icon font-icon-home"></span>Quant and Verbal</a>
+                                                        <a class="dropdown-item" href="#"><span class="font-icon font-icon-cart"></span>Real Gmat Test</a>
+                                                        <a class="dropdown-item" href="#"><span class="font-icon font-icon-speed"></span>Prep Official App</a>
+                                                        <a class="dropdown-item" href="#"><span class="font-icon font-icon-users"></span>CATprer Test</a>
+                                                        <a class="dropdown-item" href="#"><span class="font-icon font-icon-comments"></span>Third Party Test</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-user-photo">
+                                                <img src="~/Content/Uploads/@Html.Raw(item.User+"/"+item.Avatar)" alt="">
+                                            </div>
+                                            <div class="card-user-name">@Html.Raw(item.FirstName+" "+ item.LastName)</div>
+                                        @{ int c = dao.CountFriend(item.User);}
+                                            <div class="card-user-status">@Html.Raw(c.ToString()+" bạn bè")</div>
+                                            <a href="#" class="btn btn-rounded">Follow</a>
+                                            <div class="card-user-social">
+                                                <a href="#">
+                                                    <i class="font-icon font-icon-fb-fill"></i>
+                                                </a>
+                                                <a href="#">
+                                                    <i class="font-icon font-icon-vk-fill"></i>
+                                                </a>
+                                                <a href="#">
+                                                    <i class="font-icon font-icon-in-fill"></i>
+                                                </a>
+                                                <a href="#">
+                                                    <i class="font-icon font-icon-tw-fill"></i>
+                                                </a>
+                                            </div>
+                                        </article><!--.card-user-->
+                                    </div>
+                                }
+                            </div>
+                        </section>
+                    </div><!--.tab-pane-->
+                    <div role="tabpanel" class="tab-pane" id="tabs-2-tab-4">
+                        <section class="box-typical box-typical-padding">
+                            Hình ảnh
+                        </section>
+                    </div><!--.tab-pane-->
+                </div><!--.tab-content-->
+            </section><!--.tabs-section-->
+        </div>
+    </div><!--.row-->
+</div><!--.container-fluid-->
+
+<script>
+    $(document).ready(function () {
+        var numRequests = $("#numRequests").text();
+        $("#numRequestsPrint").html(numRequests);
+
+        var add = "@Html.Raw(ViewBag.mode)";
+        if (add=="Add") {
+            swal({
+                type: "error",
+                title: "Tài khoản mới tạo!",
+                text: "Yêu cầu vào phần giới thiệu cập nhật \"THÔNG TIN BẮT BUỘC!\""
+            });
+            $("#gotoaddinfomation").click();
+        }
+    });
+</script>

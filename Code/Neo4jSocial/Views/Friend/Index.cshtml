@@ -1,0 +1,100 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/Layout.cshtml";
+}
+
+<div class="box-typical box-typical-padding">
+    <h5 class="m-t-lg with-border">Tìm kiếm theo..</h5>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="checkbox-detailed">
+                <input type="radio" name="profile" id="check-det-1" checked="" value="FirstName">
+                <label for="check-det-1">
+                    <span class="checkbox-detailed-tbl">
+                        <span class="checkbox-detailed-cell">
+                            <span class="checkbox-detailed-title">Họ</span>
+                        </span>
+                    </span>
+                </label>
+            </div>
+            <div class="checkbox-detailed">
+                <input type="radio" name="profile" id="check-det-2" value="LastName">
+                <label for="check-det-2">
+                    <span class="checkbox-detailed-tbl">
+                        <span class="checkbox-detailed-cell">
+                            <span class="checkbox-detailed-title">Tên</span>
+                        </span>
+                    </span>
+                </label>
+            </div>
+            <div class="checkbox-detailed">
+                <input type="radio" name="profile" id="check-det-3" value="School">
+                <label for="check-det-3">
+                    <span class="checkbox-detailed-tbl">
+                        <span class="checkbox-detailed-cell">
+                            <span class="checkbox-detailed-title">Trường học</span>
+                        </span>
+                    </span>
+                </label>
+            </div>
+            <div class="checkbox-detailed">
+                <input type="radio" name="profile" id="check-det-4" value="Job">
+                <label for="check-det-4">
+                    <span class="checkbox-detailed-tbl">
+                        <span class="checkbox-detailed-cell">
+                            <span class="checkbox-detailed-title">Công việc</span>
+                        </span>
+                    </span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="">
+        <h5 class="m-t-lg with-border">Từ khóa tìm kiếm</h5>
+        <div class="row"> 
+            <div class="col-md-10">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Tìm bạn.." name="keySearch" id="pressEnter">
+                </div>
+            </div>
+            <div class="col-md-2" style="padding-left:0px">
+                <div class="input-group">
+                    <span class="btn btn-primary btn-block" onclick="postFF()">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container_1"></div>
+
+<script>
+    $(document).ready(function () {
+        //$('#myModal').on('shown.bs.modal', function () {
+        //});
+        $("#pressEnter").keypress(function (e) {
+            var keycode = e.keyCode || e.which;
+            if (keycode == '13') {
+                postFF();
+            }
+        })
+    })
+    function postFF() {
+        var info = $("input[name='profile']:checked").val();
+        var key = $("input[name='keySearch']").val();
+        $.ajax({
+            url: "/Friend/Search",
+            type: "POST",
+            data: { Info: info, Key: key },
+            success: function (data) {
+                $(".container_1").html(data);
+                $("#myModal").modal("show");
+            }
+        })
+    }
+</script>

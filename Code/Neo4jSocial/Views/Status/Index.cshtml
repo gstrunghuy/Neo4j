@@ -1,0 +1,84 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/Layout.cshtml";
+    Neo4jSocial.Models.Status post = ViewBag.Post as Neo4jSocial.Models.Status;
+    List<Neo4jSocial.Models.Comment> lst = ViewBag.LstCmt as List<Neo4jSocial.Models.Comment>;
+}
+
+<div class="container">
+    <article class="box-typical profile-post">
+        <div class="profile-post-header">
+            <div class="user-card-row">
+                <div class="tbl-row">
+                    <div class="tbl-cell tbl-cell-photo">
+                        <a href="#">
+                            <img src="~/Content/Uploads/@Html.Raw(post.UserPost+"/"+post.AvatarPost)" alt="">
+                        </a>
+                    </div>
+                    <div class="tbl-cell">
+                        <div class="user-card-row-name"><a href="#">@post.DisplayName</a></div>
+                        <div class="color-blue-grey-lighter">@post.TimePost.ToDateTime().ToString("d.M.yyyy, HH:mm tt")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-typical-footer profile-post-meta" style=" background: lightgrey; ">
+            <div class="profile-post-content">
+                @post.Content
+            </div>
+        </div>
+        @foreach (var cmt in lst)
+        {
+            <div class="comment-rows-container hover-action scrollable-block">
+                <div class="comment-row-item">
+                    <div class="avatar-preview avatar-preview-32">
+                        <a href="#">
+                            <img src="~/Content/Uploads/@Html.Raw(cmt.User+"/"+cmt.Avatar)" alt="">
+                        </a>
+                    </div>
+                    <div class="tbl comment-row-item-header">
+                        <div class="tbl-row">
+                            <div class="tbl-cell tbl-cell-name">@cmt.Name</div>
+                            <div class="tbl-cell tbl-cell-date">@cmt.Time.ToDateTime().ToString("d.M.yyyy, HH:mm tt")</div>
+                        </div>
+                    </div>
+                    <div class="comment-row-item-content">
+                        @cmt.Content
+                    </div>
+                </div><!--.comment-row-item-->
+            </div><!--.comment-rows-container-->
+
+        }
+    </article>
+    <form class="box-typical" method="post" action="~/Status/Comment">
+        <input type="text" class="write-something" name="Content" placeholder="Viết bình luận..." />
+        <input type="hidden" name="IdPost" value="@post.Id" />
+        <input type="hidden" name="Avatar" value="@post.AvatarPost" />
+        <input type="hidden" name="DisplayName" value="@post.DisplayName" />
+        <div class="box-typical-footer">
+            <div class="tbl">
+                <div class="tbl-row">
+                    <div class="tbl-cell">
+                        <button type="button" class="btn-icon">
+                            <i class="font-icon font-icon-earth"></i>
+                        </button>
+                        <button type="button" class="btn-icon">
+                            <i class="font-icon font-icon-picture"></i>
+                        </button>
+                        <button type="button" class="btn-icon">
+                            <i class="font-icon font-icon-calend"></i>
+                        </button>
+                        <button type="button" class="btn-icon">
+                            <i class="font-icon font-icon-video-fill"></i>
+                        </button>
+                    </div>
+                    <div class="tbl-cell tbl-cell-action">
+                        <button type="submit" class="btn btn-rounded">Bình luận</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form><!--.box-typical-->
+</div>
+

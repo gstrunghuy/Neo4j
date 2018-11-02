@@ -1,0 +1,113 @@
+﻿
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Đăng Ký Tài Khoản</title>
+    <link href="~/Content/Theme/img/avatar-2-128.png" rel="icon" type="image/png">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" href="~/Content/Theme/css/pages/login.min.css">
+    <link rel="stylesheet" href="~/Content/Theme/vendor/font-awesome/css/fontawesome.min.css">
+    <link rel="stylesheet" href="~/Content/Theme/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Content/Theme/css/main.css">
+    <link href="~/Content/Theme/vendor/sweetAlert/sweetalert2.min.css" rel="stylesheet" />
+</head>
+<body>
+
+    <div class="page-center">
+        <div class="page-center-in">
+            <div class="container-fluid">
+                <form class="sign-box">
+                    <div class="sign-avatar no-photo">&plus;</div>
+                    <header class="sign-title">Đăng ký</header>
+                    <div class="form-group">
+                        <input type="text" name="user" class="form-control" placeholder="tài khoản" required />
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" class="form-control" placeholder="mật khẩu" required onkeyup="keyEnter()"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="repeatpass" class="form-control" placeholder="nhập lại mật khẩu" required  onkeyup="keyEnter()"/>
+                    </div>
+                    <span class="btn btn-rounded btn-success sign-up" onclick="submit()">Đăng ký</span>
+                    <p class="sign-note">Bạn đã có tài khoản? <a href="../Signin/Index">Đăng nhập</a></p>
+                    <!--<button type="button" class="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>-->
+                </form>
+                <script>
+                    function keyEnter() {
+                        if (event.keyCode == 13) {
+                            submit();
+                        }
+                    }
+                    function submit() {
+                        var user = $("input[name=user]").val();
+                        var pass = $("input[name=password]").val();
+                        var repass = $("input[name=repeatpass]").val();
+                        if (user == null || user == "") {
+                            showAlert("error", "Lỗi tạo tài khoản", "Yêu cầu nhập tên đăng nhập");
+                        } else
+                            if (pass == null || pass == "") {
+                                showAlert("error", "Lỗi tạo tài khoản", "Yêu cầu nhập mật khẩu");
+                            } else
+                                if (repass == null || repass == "") {
+                                    showAlert("error", "Lỗi tạo tài khoản", "Yêu cầu nhập lại mật khẩu");
+                                } else {
+                                    $.ajax({
+                                        method: "POST",
+                                        url: "/Signup/Signup",
+                                        data: {
+                                            user: user,
+                                            password: pass,
+                                            repeatpass: repass
+                                        },
+                                        success: function (mess) {
+                                            if (mess == -1) {
+                                                showAlert("error", "Lỗi tạo tài khoản", "Mật khẩu không giống nhau");
+                                            }
+                                            if (mess == 0) {
+                                                showAlert("error", "Lỗi tạo tài khoản", "Tài khoản đã tồn tại");
+                                            }
+                                            if (mess == 1) {
+                                                window.location.href = "../Home/Index";
+                                            }
+                                        }
+                                    });
+                                }
+
+                    }
+
+                    function showAlert(type, title, text) {
+                        swal({
+                            type: type,
+                            title: title,
+                            text: text
+                        })
+                    }
+                </script>
+            </div>
+        </div>
+    </div><!--.page-center-->
+
+    <script src="~/Content/Theme/vendor/jquery/jquery.min.js"></script>
+    <script src="~/Content/Theme/vendor/font-awesome/js/fontawesome.min.js"></script>
+    <script src="~/Content/Theme/vendor/popper/popper.js"></script>
+    <script src="~/Content/Theme/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="~/Content/Theme/vendor/sweetAlert/sweetalert2.min.js"></script>
+</body>
+</html>
+

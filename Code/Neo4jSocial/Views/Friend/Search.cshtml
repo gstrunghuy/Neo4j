@@ -1,0 +1,91 @@
+﻿
+@{
+    Layout = null;
+    List<Neo4jSocial.Models.Profile> lst = ViewData["lst"] as List<Neo4jSocial.Models.Profile>;
+    Neo4jSocial.DAO.FriendDao dao = new Neo4jSocial.DAO.FriendDao();
+}
+
+<!-- The Modal -->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Kết quả tìm kiếm bạn bè</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                @if (lst.Count == 0)
+                {
+                    <p>Không có bạn bè nào như vậy. Hãy thử lại bằng tùy chọn khác.</p>
+                }
+                else
+                {
+                    <div class="friends-list stripped">
+                        @foreach (var item in lst)
+                        {
+                            <article class="friends-list-item">
+                                <div class="user-card-row">
+                                    <div class="tbl-row">
+                                        <div class="tbl-cell tbl-cell-photo">
+                                            <a href="#">
+                                                <img src="~/Content/Uploads/@Html.Raw(item.User+"/"+item.Avatar)" alt="">
+                                            </a>
+                                        </div>
+                                        @{ int age = DateTime.Now.Year - item.Birthday.Year;}
+                                        <div class="tbl-cell">
+                                            <p class="user-card-row-name status-online"><a href="#">@Html.Raw(item.FirstName + " " + item.LastName)</a></p>
+                                            <p class="user-card-row-status">@Html.Raw(item.Gender + ", " + age.ToString() + " tuổi, học trường " + item.School)</p>
+                                        </div>
+                                        <div class="tbl-cell tbl-cell-action">
+                                            @if (Session["user"].ToString() == item.User)
+                                            {
+                                                <a href="#"><span>Tôi</span></a>
+                                            }
+                                            else
+                                            {
+                                                string isFriend = dao.IsFriend(item.User, Session["user"].ToString());
+                                                if (isFriend == "NotFriend")
+                                                {
+                                                    <a class="plus-link-circle" onclick="addFriend('@item.User')" id="u_@item.User" href="#"><span>+</span></a>
+                                                }
+                                                else if (isFriend == "Request")
+                                                {
+                                                    <a href="#"><span>=</span></a>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        }
+
+                    </div>
+                }
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+<script>
+    function addFriend(user) {
+        $.ajax({
+            url: "/Friend/AddFriend",
+            type: "POST",
+            data: { User: user },
+            success: function () {
+                var id = "#u_" + user;
+                $(id).html("<span>=</span>");
+            }
+        })
+    }
+</script>
